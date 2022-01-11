@@ -34,6 +34,7 @@ import azurelinuxagent.common.conf as conf
 import azurelinuxagent.common.logger as logger
 import azurelinuxagent.common.utils.fileutil as fileutil
 import azurelinuxagent.common.version as version
+import azurelinuxagent.common.authz as authz
 from azurelinuxagent.common.agent_supported_feature import get_agent_supported_features_list_for_extensions, \
     SupportedFeatureNames, get_supported_feature_by_name, get_agent_supported_features_list_for_crp
 from azurelinuxagent.common.cgroupconfigurator import CGroupConfigurator
@@ -712,6 +713,9 @@ class ExtHandlersHandler(object):
         """
         uninstall_exit_code = None
         old_ext_handler_i = ext_handler_i.get_installed_ext_handler()
+
+        # Process interface command authorization. Processing may include modification of extension.
+        extension = authz.process_authorization_for_ext_handler(ext_handler_i, extension)
 
         current_handler_state = ext_handler_i.get_handler_state()
         ext_handler_i.logger.info("[Enable] current handler state is: {0}", current_handler_state.lower())
