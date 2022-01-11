@@ -179,7 +179,7 @@ class TestAuthz(AgentTestCase):
     def process_authorization(self, policy, op_mode: str):
         mockext_handler_i = MockExtHandlerInstance(policy)
         mockextension = MockExtension(policy)
-        authz.process_authorization_ext_handler(
+        authz.process_authorization_for_ext_handler(
             mockext_handler_i, mockextension, op_mode
         )
 

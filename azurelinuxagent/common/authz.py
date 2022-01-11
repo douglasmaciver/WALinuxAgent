@@ -99,7 +99,7 @@ def validate_action(policy, action):
         return policy == action
 
 
-def process_authorization_ext_handler(
+def process_authorization_for_ext_handler(
     ext_handler_i: Any,
     extension: Extension,
     op_mode: str = AuthzOperationMode.EnabledFailOpen,
