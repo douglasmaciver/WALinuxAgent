@@ -67,7 +67,7 @@ EXT_FUBAR_JSON = """
     "type": "extensions"
 }
 """
-POLICY_CUSTOM_SCRIPT_GOOD_VERSION = """
+POLICY_CUSTOM_SCRIPT_WITH_APPROVED_VERSION = """
 {
     "requestedState": "enabled",
     "properties": {
@@ -77,7 +77,7 @@ POLICY_CUSTOM_SCRIPT_GOOD_VERSION = """
     }
 }
 """
-POLICY_RUNCOMMAND_GOOD_VERSION = """
+POLICY_RUNCOMMAND_WITH_APPROVED_VERSION = """
 {
     "requestedState": "enabled",
     "properties": {
@@ -97,8 +97,6 @@ POLICY_CUSTOM_SCRIPT_FAKE_VERSION = """
     }
 }
 """
-# TODO: Get test dir from test env.
-LIB_DIR = "/var/lib/waagent"
 
 class MockLogger:
     def __init__(self):
@@ -135,19 +133,13 @@ class MockExtHandlerInstance:
 #    def get_extension_full_name(self, extension: str) -> str:
 #        return extension.publisher + "." + extension.name
 
-# # TODO: DRY: property retrieval
-# class MockExtension:
-#     def __init__(self, policy_json: str) -> None:
-#         policy = json.loads(policy_json)
-#         self.properties = policy["properties"]
-
-#         self.name = self.properties["type"]
-#         self.version = self.properties["typeHandlerVersion"]
-#         # self.publicSettings = self.properties["settings"]
-# #mock_ext_handler = MockExtHandlerInstance(POLICY_CUSTOM_SCRIPT_GOOD_VERSION)
-
-# # def mock_add_event(operation: str, is_success: bool, message: str, log_event: bool):
-# #     print("add_event " + " " + op + " " + message)
+class MockExtension:
+    def __init__(self, policy_json: str) -> None:
+        policy = json.loads(policy_json)
+        self.properties = policy["properties"]
+        self.name = self.properties["type"]
+        self.version = self.properties["typeHandlerVersion"]
+        # self.publicSettings = self.properties["settings"]
 
 
 class TestAuthz(AgentTestCase):
@@ -155,7 +147,7 @@ class TestAuthz(AgentTestCase):
         AgentTestCase.setUp(self)
         # TODO: test for asymm provider
         self.provider = authztoken.AuthzTokenProviderSymmetric(
-            authz.get_authz_lib_dir(LIB_DIR),
+            authz.get_authz_lib_dir(),
             authz.get_authz_crypto_private_key(),
         )
 
@@ -211,15 +203,16 @@ class TestAuthz(AgentTestCase):
         mock_reporter,
         mock_add_event,
     ):
-        policy = POLICY_CUSTOM_SCRIPT_GOOD_VERSION
+        policy = POLICY_CUSTOM_SCRIPT_WITH_APPROVED_VERSION
         token_file = self.provider.create_token(policy)
         self.process_authorization(
             policy, authz.AuthzOperationMode.EnabledFailClosed
         )
         self.provider.remove_token(token_file)
 
+        # TODO: update to add_event
         self.assertEqual(0, mock_logger_error.call_count)
-        self.assertEqual(1, mock_logger_warn.call_count)
+        self.assertEqual(0, mock_logger_warn.call_count)
         self.assertEqual(0, mock_logger_info.call_count)
 
         # args = mock_logger_error.call_args[0]

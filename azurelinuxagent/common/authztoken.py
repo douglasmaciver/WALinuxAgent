@@ -155,6 +155,10 @@ class AuthzTokenProvider:
         self.pri_key = pri_key
         self.algorithm = algorithm
 
+        # TODO: Not the best place for this.
+        if not os.path.isdir(self.tokens_dir):
+            os.mkdir(self.tokens_dir)
+
     @staticmethod
     def create_new_note_id() -> str:
         """Wrapper API function to hide AuthzTokenNote."""
@@ -173,7 +177,8 @@ class AuthzTokenProvider:
             filename = note_id + AUTHZTOKEN_FILE_SUFFIX 
         else:
             filename = filename_override + AUTHZTOKEN_FILE_SUFFIX  
-        
+
+
         token_file_path = os.path.join(self.tokens_dir, filename)
         with open(token_file_path, "wb") as token_file_out:
             creator.to_store(token_file_out)
