@@ -31,11 +31,11 @@ environment settings coded in this module will move to their respective areas.
 import traceback
 import json
 from typing import Any
-import azurelinuxagent.common.conf as conf
-import azurelinuxagent.common.logger as logger
-import azurelinuxagent.common.authztoken as authztoken
+from azurelinuxagent.common import conf
+from azurelinuxagent.common import logger
+from azurelinuxagent.common import authztoken
 from azurelinuxagent.common.protocol.restapi import Extension
-from azurelinuxagent.common.exception import ExtensionError
+from azurelinuxagent.common.exception import ExtensionConfigError
 from azurelinuxagent.common.future import ustr
 from azurelinuxagent.common.event import add_event, WALAEventOperation
 
@@ -44,6 +44,7 @@ AUTHZ_LIB_DIR = "authz"
 
 
 def get_authz_lib_dir(base_dir: str) -> str:
+    """temporary function"""
     return base_dir + "/" + AUTHZ_LIB_DIR
 
 
@@ -52,6 +53,7 @@ AUTHZ_FAKE_SYM_KEY = "authz fake sym key"
 
 
 def get_authz_crypto_private_key() -> str:
+    """temporary function"""
     return AUTHZ_FAKE_SYM_KEY
 
 
@@ -67,13 +69,13 @@ ACTION_EXT_ENABLED = """
 """
 
 
-class ExtensionsAuthorizationError(ExtensionError):
+class ExtensionsAuthorizationError(ExtensionConfigError):
     """
     Error raised when an extension action is unauthorized.
     """
 
 
-class AuthzOperationMode():
+class AuthzOperationMode:
     """
     The Authz framework is disabled, no checks are processed. If the Authz
     framework is enabled, failed authorizations are handled in two ways:
@@ -115,19 +117,20 @@ def process_authorization_for_ext_handler(
 
         provider = authztoken.AuthzTokenProviderSymmetric(
             get_authz_lib_dir(conf.get_lib_dir()),
-            get_authz_crypto_private_key()
+            get_authz_crypto_private_key(),
         )
         action = json.loads(ACTION_EXT_ENABLED)
         # TODO: set requestedState
         properties = action["properties"]
         properties["publisher"] = ext_handler_i.ext_handler.name
         properties["type"] = extension.name
-        properties["typeHandlerVersion"] = ext_handler_i.ext_handler.version
+        properties[
+            "typeHandlerVersion"
+        ] = ext_handler_i.ext_handler.properties.version
         is_authorized = provider.is_authorized(validate_action, action)
-        #ext_handler_i.logger.info("[Authz: {0} action]: {1}", message, action)
 
-        event_message = "[Authz: {status} action]: {action}".format(
-            status="authorized" if is_authorized else "unauthorized", action=action)
+        judgement = "authorized" if is_authorized else "unauthorized"
+        event_message = f"[Authz: {judgement} action]: {action}"
 
         # TODO: Add special Authz operation.
         add_event(
@@ -136,17 +139,16 @@ def process_authorization_for_ext_handler(
             message=event_message,
             log_event=True,
         )
-        if op_mode == AuthzOperationMode.EnabledFailClosed:
+        if (
+            not is_authorized
+            and op_mode == AuthzOperationMode.EnabledFailClosed
+        ):
             raise ExtensionsAuthorizationError(event_message)
 
         # TODO: Future: extension may be modified if some settings are encrypted
         return extension
-    except Exception as e:
-        msg = "authz exception: {0}: {1}".format(
-            ustr(e), traceback.format_exc()
-        )
+    except Exception as error:
+        # TODO: Remove after initial development
+        msg = f"authz exception: {ustr(error)}: {traceback.format_exc()}"
         logger.info(msg)
-        # TODO: remove after initial debugging
-        # TODO: develop fail-open, fail-closed concept
-        # TODO: raise exception
-        return extension
+        raise error
