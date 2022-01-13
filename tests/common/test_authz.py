@@ -104,15 +104,30 @@ class MockLogger:
     def __init__(self):
         self.info = print
 
+#class ExtHandlerProperties(DataContract):
+class MockExtHandlerProperties():
+    def __init__(self, version):
+        self.version = version
+        self.state = None
+    #    self.extensions = DataContractList(Extension)
+
+#class ExtHandler(DataContract):
+class MockExtHandler():
+    def __init__(self, name, version):
+        self.name = name
+        self.properties = MockExtHandlerProperties(version)
+#        self.versionUris = DataContractList(ExtHandlerVersionUri)
+#        self.__invalid_handler_setting_reason = None
+#        self.supports_multi_config = False
 
 # ext_handler_i in prod code
 class MockExtHandlerInstance:
-    def __init__(self, _policy: str) -> None:
-        policy = json.loads(_policy)
+    def __init__(self, policy_json: str) -> None:
+        policy = json.loads(policy_json)
         self.properties = policy["properties"]
-        self.ext_handler = MockExtension(_policy)
-        self.name = self.properties["publisher"]
-        self.version = self.properties["typeHandlerVersion"]
+        self.ext_handler = MockExtHandler(self.properties["publisher"], self.properties["typeHandlerVersion"])
+        #self.name = 
+        #self.version = 
         # self.publicSettings = self.properties["settings"]
         self.logger = MockLogger()
 
@@ -120,19 +135,19 @@ class MockExtHandlerInstance:
 #    def get_extension_full_name(self, extension: str) -> str:
 #        return extension.publisher + "." + extension.name
 
-# TODO: DRY: property retrieval
-class MockExtension:
-    def __init__(self, policy: str) -> None:
-        policy = json.loads(policy)
-        self.properties = policy["properties"]
+# # TODO: DRY: property retrieval
+# class MockExtension:
+#     def __init__(self, policy_json: str) -> None:
+#         policy = json.loads(policy_json)
+#         self.properties = policy["properties"]
 
-        self.name = self.properties["type"]
-        self.version = self.properties["typeHandlerVersion"]
-        # self.publicSettings = self.properties["settings"]
+#         self.name = self.properties["type"]
+#         self.version = self.properties["typeHandlerVersion"]
+#         # self.publicSettings = self.properties["settings"]
+# #mock_ext_handler = MockExtHandlerInstance(POLICY_CUSTOM_SCRIPT_GOOD_VERSION)
 
-
-# def mock_add_event(operation: str, is_success: bool, message: str, log_event: bool):
-#     print("add_event " + " " + op + " " + message)
+# # def mock_add_event(operation: str, is_success: bool, message: str, log_event: bool):
+# #     print("add_event " + " " + op + " " + message)
 
 
 class TestAuthz(AgentTestCase):
