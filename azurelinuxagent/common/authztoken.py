@@ -160,7 +160,7 @@ class AuthzTokenProvider:
         """Wrapper API function to hide AuthzTokenNote."""
         return AuthzTokenNote.create_new_id()
 
-    def create_token(self, payload: str) -> str:
+    def create_token(self, payload: str, filename_override: str = None) -> str:
         """Create a token file given a payload."""
         note_id = AuthzTokenNote.create_new_id()
         encoder = AuthzTokenJWTEncoder(self.pri_key, self.algorithm)
@@ -169,9 +169,12 @@ class AuthzTokenProvider:
         note_header = {"noteID": note_id, "cmd": "enable"}
         creator.note = AuthzTokenNote(str(note_header), payload)
 
-        token_file_path = os.path.join(
-            self.tokens_dir, note_id + AUTHZTOKEN_FILE_SUFFIX
-        )
+        if not filename_override:
+            filename = note_id + AUTHZTOKEN_FILE_SUFFIX 
+        else:
+            filename = filename_override + AUTHZTOKEN_FILE_SUFFIX  
+        
+        token_file_path = os.path.join(self.tokens_dir, filename)
         with open(token_file_path, "wb") as token_file_out:
             creator.to_store(token_file_out)
         return token_file_path
@@ -204,6 +207,13 @@ class AuthzTokenProvider:
 
         # If we get here, matching token was not found.
         return False
+
+    def display_tokens(self) -> None:
+        """Displays tokens in working directory."""
+        for file_desc in os.listdir(self.tokens_dir):
+            note = self.read_note(os.path.join(self.tokens_dir, file_desc))
+            policy = json.loads(note.payload)
+            print(policy)
 
     def is_authorized(self, validate_action: Any, action: Any) -> bool:
         """Determines if an action is authorized according to policy."""
