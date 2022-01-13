@@ -43,9 +43,9 @@ from azurelinuxagent.common.event import add_event, WALAEventOperation
 AUTHZ_LIB_DIR = "authz"
 
 
-def get_authz_lib_dir(base_dir: str) -> str:
+def get_authz_lib_dir() -> str:
     """temporary function"""
-    return base_dir + "/" + AUTHZ_LIB_DIR
+    return conf.get_lib_dir() + "/" + AUTHZ_LIB_DIR
 
 
 # TODO: Implement key retrieval from environment.
@@ -116,7 +116,7 @@ def process_authorization_for_ext_handler(
             return extension
 
         provider = authztoken.AuthzTokenProviderSymmetric(
-            get_authz_lib_dir(conf.get_lib_dir()),
+            get_authz_lib_dir(),
             get_authz_crypto_private_key(),
         )
         action = json.loads(ACTION_EXT_ENABLED)
