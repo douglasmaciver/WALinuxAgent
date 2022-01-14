@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright 2020 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+import os
+import argparse
 import azurelinuxagent.common.authztoken as authztoken
 
 POLICY_RUNCOMMAND_ENABLE = """
@@ -58,5 +63,37 @@ def create_standard_tokens(provider: authztoken.AuthzTokenProvider):
     """Utility function that creates a set of standard tokens."""
     print(provider.create_token(POLICY_RUNCOMMAND_ENABLE, "Microsoft.CPlat.Core.RunCommandLinux"))
     print(provider.create_token(POLICY_OMSAGENT_ENABLE, "Microsoft.EnterpriseCloud.Monitoring.OmsAgentForLinux"))
-    print(token_file = provider.create_token(POLICY_CUSTOMSCRIPT_ENABLE, "Microsoft.Azure.Extensions.customScript"))
+    print(provider.create_token(POLICY_CUSTOMSCRIPT_ENABLE, "Microsoft.Azure.Extensions.customScript"))
     print(provider.create_token(POLICY_DSCFORLINUX_ENABLE, "Microsoft.OSTCExtensions.DSCForLinux"))
+
+
+def create_tokens(tokens_dir: str, private_key: str) -> bool:
+    provider = authztoken.AuthzTokenProviderSymmetric(
+            tokens_dir,
+            private_key,
+    )
+    create_standard_tokens(provider)
+
+# def _dir_path(string):
+#     if os.path.isdir(string):
+#         return string
+#     else:
+#         raise NotADirectoryError(string)
+
+# TODO: support ~ in directory path
+def main() -> int:
+    parser = argparse.ArgumentParser(description='authz token services')
+    parser.add_argument('--dir', nargs=1, type=str, default="authz",
+                        help='directory where tokens are')
+    parser.add_argument('--priv', nargs=1, type=str,  default="authz fake sym key",
+                        help='private key for signing')                    
+    parser.add_argument('--create', action='store_true', 
+                        help="create standard tokens")
+
+    args = parser.parse_args()
+    if args.create :
+        return create_tokens(args.dir[0], args.priv)
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())
