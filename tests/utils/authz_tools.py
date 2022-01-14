@@ -68,11 +68,14 @@ def create_standard_tokens(provider: authztoken.AuthzTokenProvider):
 
 
 def create_tokens(tokens_dir: str, private_key: str) -> bool:
+
+
     provider = authztoken.AuthzTokenProviderSymmetric(
             tokens_dir,
             private_key,
     )
     create_standard_tokens(provider)
+    return True
 
 # def _dir_path(string):
 #     if os.path.isdir(string):
@@ -80,19 +83,32 @@ def create_tokens(tokens_dir: str, private_key: str) -> bool:
 #     else:
 #         raise NotADirectoryError(string)
 
-# TODO: support ~ in directory path
+# TODO: support ~ in directory path.
+# TODO: find a better way to handle default for dir.
 def main() -> int:
     parser = argparse.ArgumentParser(description='authz token services')
-    parser.add_argument('--dir', nargs=1, type=str, default="authz",
+    parser.add_argument('--dir', nargs=1, type=str, default=[""],
                         help='directory where tokens are')
+    # TODO: Improve default key scheme.
     parser.add_argument('--priv', nargs=1, type=str,  default="authz fake sym key",
                         help='private key for signing')                    
-    parser.add_argument('--create', action='store_true', 
+    parser.add_argument('--createStd', action='store_true', 
                         help="create standard tokens")
+    # parser.add_argument('--store', action='store_true', default=True
+    #                     help="create standard tokens")
+
 
     args = parser.parse_args()
-    if args.create :
-        return create_tokens(args.dir[0], args.priv)
+
+    if args.dir[0] == "":
+        tokens_dir = os.path.join(os.getcwd(), "authz")
+    else:
+        tokens_dir = dir[0]
+    if args.createStd :
+        return create_tokens(tokens_dir, args.priv)
+    # if args.store:
+    #     return store_token(tokens_dir, args.token)
+
     return 0
 
 if __name__ == '__main__':
