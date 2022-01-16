@@ -49,6 +49,20 @@ POLICY_CUSTOMSCRIPT_ENABLE = """
     }
 }
 """
+POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE = """
+{
+    "requestedState": "enabled",
+    "properties": {
+    "publisher": "Microsoft.Azure.Extensions.customScript",
+    "type": "Microsoft.Azure.Extensions.customScript",
+    "typeHandlerVersion": "2.1.6"
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        },
+    }
+}
+"""
 POLICY_DSCFORLINUX_ENABLE = """
 {
     "requestedState": "enabled",
@@ -65,7 +79,7 @@ def create_standard_tokens(provider: authztoken.AuthzTokenProvider):
     print(provider.create_token(POLICY_OMSAGENT_ENABLE, "Microsoft.EnterpriseCloud.Monitoring.OmsAgentForLinux"))
     print(provider.create_token(POLICY_CUSTOMSCRIPT_ENABLE, "Microsoft.Azure.Extensions.customScript"))
     print(provider.create_token(POLICY_DSCFORLINUX_ENABLE, "Microsoft.OSTCExtensions.DSCForLinux"))
-
+    print(provider.create_token(POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE, "Microsoft.Azure.Extensions.customScript_store_authz"))
 
 def create_tokens(tokens_dir: str, private_key: str) -> bool:
 
