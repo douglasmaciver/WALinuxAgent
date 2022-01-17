@@ -230,7 +230,8 @@ class TestAuthz(AgentTestCase):
 
         # TODO: update to add_event
         self.assertEqual(0, mock_logger_error.call_count)
-        self.assertEqual(0, mock_logger_warn.call_count)
+        # TODO: this is warn==1 is matched with the temporary logging in process_authorization_for_ext_handler.
+        self.assertEqual(1, mock_logger_warn.call_count)
         self.assertEqual(0, mock_logger_info.call_count)
 
         # args = mock_logger_error.call_args[0]

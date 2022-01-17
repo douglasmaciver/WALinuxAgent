@@ -25,7 +25,11 @@ POLICY_RUNCOMMAND_ENABLE = """
     "properties": {
     "publisher": "Microsoft.CPlat.Core.RunCommandLinux",
     "type": "Microsoft.CPlat.Core.RunCommandLinux",
-    "typeHandlerVersion": "1.0.3"
+    "typeHandlerVersion": "1.0.3",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
     }
 }
 """
@@ -35,7 +39,11 @@ POLICY_OMSAGENT_ENABLE = """
     "properties": {
     "publisher": "Microsoft.EnterpriseCloud.Monitoring.OmsAgentForLinux",
     "type": "Microsoft.EnterpriseCloud.Monitoring.OmsAgentForLinux",
-    "typeHandlerVersion": "1.13.40"
+    "typeHandlerVersion": "1.13.40",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
     }
 }
 """
@@ -45,7 +53,11 @@ POLICY_CUSTOMSCRIPT_ENABLE = """
     "properties": {
     "publisher": "Microsoft.Azure.Extensions.customScript",
     "type": "Microsoft.Azure.Extensions.customScript",
-    "typeHandlerVersion": "2.1.6"
+    "typeHandlerVersion": "2.1.6",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
     }
 }
 """
@@ -69,7 +81,11 @@ POLICY_DSCFORLINUX_ENABLE = """
     "properties": {
     "publisher": "Microsoft.OSTCExtensions.DSCForLinux",
     "type": "Microsoft.OSTCExtensions.DSCForLinux",
-    "typeHandlerVersion": "3.0.0.5"
+    "typeHandlerVersion": "3.0.0.5",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
     }
 }
 """
@@ -91,6 +107,16 @@ def create_tokens(tokens_dir: str, private_key: str) -> bool:
     create_standard_tokens(provider)
     return True
 
+def display_tokens(tokens_dir: str, private_key: str) -> bool:
+
+
+    provider = authztoken.AuthzTokenProviderSymmetric(
+            tokens_dir,
+            private_key,
+    )
+    provider.display_tokens()
+    return True
+
 # def _dir_path(string):
 #     if os.path.isdir(string):
 #         return string
@@ -108,6 +134,8 @@ def main() -> int:
                         help='private key for signing')                    
     parser.add_argument('--createStd', action='store_true', 
                         help="create standard tokens")
+    parser.add_argument('--display', action='store_true', 
+                        help="display tokens in directory specified")
     # parser.add_argument('--store', action='store_true', default=True
     #                     help="create standard tokens")
 
@@ -117,13 +145,13 @@ def main() -> int:
     if args.dir[0] == "":
         tokens_dir = os.path.join(os.getcwd(), "authz")
     else:
-        tokens_dir = dir[0]
+        tokens_dir = args.dir[0]
     if args.createStd :
         return create_tokens(tokens_dir, args.priv)
     # if args.store:
     #     return store_token(tokens_dir, args.token)
-
-    return 0
+    if args.display:
+        return display_tokens(tokens_dir, args.priv)
 
 if __name__ == '__main__':
     sys.exit(main())

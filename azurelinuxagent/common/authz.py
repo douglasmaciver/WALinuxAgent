@@ -136,6 +136,8 @@ def process_authorization_for_ext_handler(
         judgement = "authorized" if is_authorized else "unauthorized"
         event_message = f"[Authz: {judgement} action]: {action}"
 
+        # TODO: remove once events are operational
+        logger.info(event_message)
         # TODO: Add special Authz operation.
         add_event(
             op=WALAEventOperation.ExtensionProcessing,
