@@ -63,11 +63,11 @@ ACTION_EXT_ENABLED = """
     "properties": {
     "publisher": "Microsoft.Azure.Extensions",
     "type": "CustomScript",
-    "typeHandlerVersion": "2.1"
+    "typeHandlerVersion": "2.1",
     "settings_sub": {
         "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
         "commandToExecute_1" : "/var/lib/waagent/authz"
-        },
+        }
     }
 }
 """

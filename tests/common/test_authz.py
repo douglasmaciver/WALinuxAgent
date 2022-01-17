@@ -93,7 +93,25 @@ POLICY_CUSTOM_SCRIPT_FAKE_VERSION = """
     "properties": {
     "publisher": "Microsoft.Azure.Extensions",
     "type": "CustomScript",
-    "typeHandlerVersion": "3.0"
+    "typeHandlerVersion": "3.0",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
+    }
+}
+"""
+POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE = """
+{
+    "requestedState": "enabled",
+    "properties": {
+    "publisher": "Microsoft.Azure.Extensions.customScript",
+    "type": "Microsoft.Azure.Extensions.customScript",
+    "typeHandlerVersion": "2.1.6",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
     }
 }
 """
@@ -139,7 +157,7 @@ class MockExtension:
         self.properties = policy["properties"]
         self.name = self.properties["type"]
         self.version = self.properties["typeHandlerVersion"]
-        # self.publicSettings = self.properties["settings"]
+        self.settings = self.properties["settings_sub"]
 
 
 class TestAuthz(AgentTestCase):
@@ -203,7 +221,7 @@ class TestAuthz(AgentTestCase):
         mock_reporter,
         mock_add_event,
     ):
-        policy = POLICY_CUSTOM_SCRIPT_WITH_APPROVED_VERSION
+        policy = POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE
         token_file = self.provider.create_token(policy)
         self.process_authorization(
             policy, authz.AuthzOperationMode.EnabledFailClosed

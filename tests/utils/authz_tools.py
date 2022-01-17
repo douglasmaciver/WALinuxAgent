@@ -55,11 +55,11 @@ POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE = """
     "properties": {
     "publisher": "Microsoft.Azure.Extensions.customScript",
     "type": "Microsoft.Azure.Extensions.customScript",
-    "typeHandlerVersion": "2.1.6"
+    "typeHandlerVersion": "2.1.6",
     "settings_sub": {
         "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
         "commandToExecute_1" : "/var/lib/waagent/authz"
-        },
+        }
     }
 }
 """
