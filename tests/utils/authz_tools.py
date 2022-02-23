@@ -89,6 +89,20 @@ POLICY_DSCFORLINUX_ENABLE = """
     }
 }
 """
+POLICY_KEYVAULT_ENABLE = """
+{
+    "requestedState": "enabled",
+    "properties": {
+    "publisher": "Microsoft.Azure.KeyVault.KeyVaultForLinux",
+    "type": "Microsoft.Azure.KeyVault.KeyVaultForLinux",
+    "typeHandlerVersion": "2.1.1774.23",
+    "settings_sub": {
+        "commandToExecute_0" : "/var/lib/waagent/authz_store_token.py",
+        "commandToExecute_1" : "/var/lib/waagent/authz"
+        }
+    }
+}
+"""
 def create_standard_tokens(provider: authztoken.AuthzTokenProvider):
     """Utility function that creates a set of standard tokens."""
     print(provider.create_token(POLICY_RUNCOMMAND_ENABLE, "Microsoft.CPlat.Core.RunCommandLinux"))
@@ -96,7 +110,7 @@ def create_standard_tokens(provider: authztoken.AuthzTokenProvider):
     print(provider.create_token(POLICY_CUSTOMSCRIPT_ENABLE, "Microsoft.Azure.Extensions.customScript"))
     print(provider.create_token(POLICY_DSCFORLINUX_ENABLE, "Microsoft.OSTCExtensions.DSCForLinux"))
     print(provider.create_token(POLICY_CUSTOMSCRIPT_STORE_AUTHZ_ENABLE, "Microsoft.Azure.Extensions.customScript_store_authz"))
-
+    print(provider.create_token(POLICY_KEYVAULT_ENABLE, "Microsoft.Azure.KeyVault.KeyVaultForLinux"))
 def create_tokens(tokens_dir: str, private_key: str) -> bool:
 
 

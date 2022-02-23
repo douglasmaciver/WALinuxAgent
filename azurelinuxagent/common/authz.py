@@ -139,12 +139,12 @@ def process_authorization_for_ext_handler(
         # TODO: remove once events are operational
         logger.info(event_message)
         # TODO: Add special Authz operation.
-        add_event(
-            op=WALAEventOperation.ExtensionProcessing,
-            is_success=is_authorized,
-            message=event_message,
-            log_event=True,
-        )
+        # add_event(
+        #     op=WALAEventOperation.ExtensionProcessing,
+        #     is_success=is_authorized,
+        #     message=event_message,
+        #     log_event=True,
+        # )
         if (
             not is_authorized
             and op_mode == AuthzOperationMode.EnabledFailClosed

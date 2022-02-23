@@ -714,8 +714,8 @@ class ExtHandlersHandler(object):
         uninstall_exit_code = None
         old_ext_handler_i = ext_handler_i.get_installed_ext_handler()
 
-        # Process interface command authorization. Processing may include modification of extension.
-        extension = authz.process_authorization_for_ext_handler(ext_handler_i, extension)
+        # Process interface command authorization.
+        authz.process_authorization_for_ext_handler(ext_handler_i, extension)
 
         current_handler_state = ext_handler_i.get_handler_state()
         ext_handler_i.logger.info("[Enable] current handler state is: {0}", current_handler_state.lower())
